@@ -8,6 +8,7 @@ This folder contains everything needed to deploy the AgentGPT conversation viewe
 
 - **Salesforce CLI** (2.0+): `sf version`
 - **Org with**: Data Cloud enabled, Agentforce / Session Tracing data model, and (for AI titles) an Einstein Prompt Template
+- **Users of the components** must have the **Data Cloud User** permission set and either **Prompt Template User** or **Prompt Template Manager** applied (for viewing conversations and AI-generated titles).
 
 ## 1. Authenticate
 
