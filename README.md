@@ -2,6 +2,8 @@
 
 This folder contains everything needed to deploy the AgentGPT conversation viewer to a Salesforce org. Use it after cloning or downloading the repo.
 
+**Included in this deploy:** The **Agent Conversations** custom tab and its Lightning App Page (with the Conversation Viewer component) are in source. After deploy, add the tab to your app and optionally add the Home widget (see step 4).
+
 ## Prerequisites
 
 - **Salesforce CLI** (2.0+): `sf version`
@@ -42,17 +44,19 @@ sf project deploy start -o myOrg
 
 Wait for **Status: Succeeded**.
 
-## 4. Add components to a page
+## 4. Add the tab to your app
 
-- **Full conversation viewer**  
-  Setup → Lightning App Builder → New → App Page → name (e.g. "Agent Conversations") → add **Agent GPT - Conversation Viewer** → Save → Activate → assign to app.
+The **Agent Conversations** tab and its App Page (Conversation Viewer) are deployed with this project. To show them in your app:
+
+- **Add the tab to your Lightning app**  
+  Setup → App Manager → select your app → Edit → **Navigation Items** → add **Agent Conversations** → Save.
 
 - **Home tab widget (optional)**  
   Edit the app Home page in Lightning App Builder → add **Agent Sessions (Home)** → Save → Activate.
 
 ## 5. Verify
 
-- Open the app page; you should see the sidebar and session list (or “No conversations found” if there’s no data).
+- Open the **Agent Conversations** tab in your app; you should see the sidebar and session list (or “No conversations found” if there’s no data).
 - Run Apex tests: `sf apex run test -o myOrg -n AgentGPTControllerTest -r human`
 
 ## Data Cloud
