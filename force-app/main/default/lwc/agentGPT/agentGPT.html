@@ -1,0 +1,179 @@
+<template>
+    <div class="agent-gpt-wrapper">
+        <!-- Main Header -->
+        <header class="main-header">
+            <h1 class="main-title">Employee Agent Conversations</h1>
+        </header>
+
+        <!-- Loading Overlay -->
+        <template if:true={isLoading}>
+            <div class="loading-overlay">
+                <div class="loading-content">
+                    <img src={loadingIconSrc} 
+                         alt="Loading" 
+                         class="loading-icon pulse-animation">
+                    <p class="loading-text">Loading conversations...</p>
+                </div>
+            </div>
+        </template>
+
+        <!-- Main Layout -->
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Sidebar Header -->
+                <div class="sidebar-header">
+                    <div class="header-content">
+                        <lightning-icon icon-name="utility:chat" size="x-small"></lightning-icon>
+                        <h2 class="sidebar-title">History</h2>
+                    </div>
+                    <lightning-button-menu
+                        alternative-text="Filter"
+                        icon-size="x-small"
+                        icon-name="utility:filterList"
+                        onselect={handleFilterChange}
+                        variant="border-filled"
+                        class="filter-menu">
+                        <lightning-menu-item value="7" label="Last 7 days" checked={isSevenDays}></lightning-menu-item>
+                        <lightning-menu-item value="30" label="Last 30 days" checked={isThirtyDays}></lightning-menu-item>
+                        <lightning-menu-item value="90" label="Last 90 days" checked={isNinetyDays}></lightning-menu-item>
+                    </lightning-button-menu>
+                </div>
+
+                <!-- Session List -->
+                <div class="session-list">
+                    <template if:true={hasSessions}>
+                        <template for:each={groupedSessions} for:item="group">
+                            <div key={group.label} class="session-group">
+                                <div class="group-label">
+                                    <lightning-icon icon-name={group.icon} size="xx-small"></lightning-icon>
+                                    <span>{group.label}</span>
+                                </div>
+                                <div class="group-items">
+                                    <template for:each={group.sessions} for:item="session">
+                                        <div
+                                            key={session.sessionId}
+                                            class={session.cssClass}
+                                            data-session-id={session.sessionId}
+                                            onclick={handleSessionSelect}>
+                                            <lightning-icon icon-name="utility:chat" size="x-small" class="session-icon"></lightning-icon>
+                                            <div class="session-details">
+                                                <p class="session-title">{session.title}</p>
+                                                <div class="session-meta-row">
+                                                    <p class="session-agent">{session.agentName}</p>
+                                                    <span class="session-date-badge">{session.formattedDate}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                    <!-- Empty State -->
+                    <template if:false={hasSessions}>
+                        <div class="empty-state">
+                            <lightning-icon icon-name="utility:chat" size="large" class="empty-icon"></lightning-icon>
+                            <p class="empty-title">No conversations found</p>
+                            <p class="empty-subtitle">Try adjusting your date filter</p>
+                        </div>
+                    </template>
+                </div>
+            </aside>
+
+            <!-- Main Chat Area -->
+            <main class="chat-main">
+                <template if:true={hasSelectedSession}>
+                    <!-- Chat Header -->
+                    <header class="chat-header">
+                        <div class="header-left">
+                            <div class="agent-avatar">
+                                <img src={agentAstroSrc} 
+                                     alt="Agent" 
+                                     class="agent-avatar-img">
+                            </div>
+                            <div class="header-info">
+                                <h1 class="chat-title">{selectedSession.agentName}</h1>
+                                <div class="chat-subtitle">
+                                    <span>{selectedSession.title}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- Breadcrumb -->
+                    <nav class="breadcrumb">
+                        <a href="#" class="breadcrumb-link" onclick={handleBackToList}>History</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">{selectedSession.title}</span>
+                    </nav>
+
+                    <!-- Messages Container -->
+                    <div class="messages-container">
+                        <template if:true={hasMessages}>
+                            <template for:each={selectedSession.messages} for:item="message">
+                                <div key={message.timestamp} class={message.cssClass}>
+                                    <template if:true={message.isUser}>
+                                        <div class="message-wrapper user-wrapper">
+                                            <p class="message-label">{message.roleLabel}</p>
+                                            <div class="message-bubble user-bubble">
+                                                <lightning-formatted-rich-text value={message.renderedContent} class="message-text"></lightning-formatted-rich-text>
+                                            </div>
+                                            <p class="message-time">{message.formattedTime}</p>
+                                        </div>
+                                    </template>
+                                    
+                                    <template if:false={message.isUser}>
+                                        <div class="message-wrapper agent-wrapper">
+                                            <div class="agent-avatar-small">
+                                                <img src={agentAstroSrc} 
+                                                     alt="Agent" 
+                                                     class="agent-avatar-small-img">
+                                            </div>
+                                            <div class="agent-message-content">
+                                                <p class="message-label agent-label">{message.roleLabel}</p>
+                                                <div class="message-bubble agent-bubble">
+                                                    <lightning-formatted-rich-text value={message.renderedContent} class="message-text"></lightning-formatted-rich-text>
+                                                </div>
+                                                <p class="message-time">{message.formattedTime}</p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            
+                            <!-- End of Transcript -->
+                            <div class="transcript-end">
+                                <div class="end-divider"></div>
+                                <p class="end-text">END OF TRANSCRIPT</p>
+                            </div>
+                        </template>
+
+                        <!-- No Messages -->
+                        <template if:false={hasMessages}>
+                            <div class="no-messages">
+                                <p>No messages in this conversation</p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Footer -->
+                    <footer class="chat-footer">
+                        <lightning-icon icon-name="utility:info" size="xx-small"></lightning-icon>
+                        <p>This is an archived read-only conversation.</p>
+                    </footer>
+                </template>
+
+                <!-- No Selection State -->
+                <template if:false={hasSelectedSession}>
+                    <div class="no-selection">
+                        <lightning-icon icon-name="utility:comments" size="large" class="no-selection-icon"></lightning-icon>
+                        <h2 class="no-selection-title">Select a conversation</h2>
+                        <p class="no-selection-text">Choose a conversation from the sidebar to view the chat history</p>
+                    </div>
+                </template>
+            </main>
+        </div>
+    </div>
+</template>

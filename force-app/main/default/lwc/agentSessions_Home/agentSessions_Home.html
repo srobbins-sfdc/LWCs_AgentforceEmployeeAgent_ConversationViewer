@@ -1,0 +1,139 @@
+<template>
+    <article class="slds-card">
+        <header class="slds-card__header slds-grid">
+            <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure" data-key="agent_astro">
+                    <lightning-icon icon-name="utility:agent_astro" alternative-text="Agentforce" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title slds-truncate">
+                        <span class="slds-text-heading_small">Recent Agent Conversations</span>
+                    </h2>
+                </div>
+            </div>
+        </header>
+        <div class="slds-card__body slds-card__body_inner">
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center slds-p-around_medium">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+            <template if:false={isLoading}>
+                <template if:true={hasSessions}>
+                    <ul class="slds-list_vertical slds-has-dividers_around-space">
+                        <template for:each={sessions} for:item="session">
+                            <li key={session.sessionId} class="slds-item session-row session-tile" data-session-id={session.sessionId} onclick={handleSessionClick}>
+                                <div class="slds-grid slds-wrap slds-gutters_small">
+                                    <div class="slds-col slds-size_1-of_1 slds-medium-size_1-of_1">
+                                        <p class="slds-text-heading_small slds-truncate session-title" title={session.title}>{session.title}</p>
+                                        <p class="slds-text-body_small slds-text-color_weak session-meta">
+                                            <template if:true={session.agentName}>{session.agentName}</template>
+                                            <template if:false={session.agentName}>Agent</template>
+                                            <span class="slds-m-left_xx-small"> · </span>
+                                            <span>{session.formattedDate}</span>
+                                            <template if:true={session.hasStartTime}>
+                                                <span class="slds-m-left_xx-small"> · </span>
+                                                <span>{session.formattedStartTime}</span>
+                                            </template>
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                    <div class="slds-m-top_small slds-grid slds-grid_vertical-align-center slds-gutters_small">
+                        <div class="slds-col slds-size_1-of-2 slds-text-align_left">
+                            <span class="slds-text-body_small slds-text-color_weak">{pageInfo}</span>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-text-align_right">
+                            <lightning-button-group>
+                                <lightning-button
+                                    label="Previous"
+                                    icon-name="utility:chevronleft"
+                                    icon-position="left"
+                                    onclick={handlePrev}
+                                    disabled={prevButtonDisabled}
+                                    variant="neutral">
+                                </lightning-button>
+                                <lightning-button
+                                    label="Next"
+                                    icon-name="utility:chevronright"
+                                    icon-position="right"
+                                    onclick={handleNext}
+                                    disabled={nextButtonDisabled}
+                                    variant="neutral">
+                                </lightning-button>
+                            </lightning-button-group>
+                        </div>
+                    </div>
+                </template>
+                <template if:false={hasSessions}>
+                    <div class="slds-align_absolute-center slds-p-around_medium">
+                        <p class="slds-text-body_regular slds-text-color_weak">No recent sessions.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </article>
+
+    <!-- Conversation overlay (centered modal) -->
+    <template if:true={showOverlay}>
+        <section class="overlay-backdrop" onclick={handleCloseOverlay} role="presentation">
+            <div class="overlay-modal" role="dialog" aria-modal="true" aria-label="Conversation" onclick={handleOverlayModalClick}>
+                <header class="overlay-header">
+                    <h2 class="overlay-title">{overlaySessionTitle}</h2>
+                    <lightning-button-icon
+                        icon-name="utility:close"
+                        alternative-text="Close"
+                        onclick={handleCloseOverlay}
+                        variant="bare"
+                        class="overlay-close">
+                    </lightning-button-icon>
+                </header>
+                <div class="overlay-messages">
+                    <template if:true={hasOverlayMessages}>
+                        <template for:each={overlayProcessedMessages} for:item="message">
+                            <div key={message.key} class={message.wrapperClass}>
+                                <template if:true={message.isUser}>
+                                    <div class="message-wrapper user-wrapper">
+                                        <p class="message-label">{message.roleLabel}</p>
+                                        <div class="message-bubble user-bubble">
+                                            <lightning-formatted-rich-text value={message.renderedContent} class="message-text"></lightning-formatted-rich-text>
+                                        </div>
+                                        <p class="message-time">{message.formattedTime}</p>
+                                    </div>
+                                </template>
+                                <template if:false={message.isUser}>
+                                    <div class="message-wrapper agent-wrapper">
+                                        <div class="agent-avatar-small">
+                                            <lightning-icon icon-name="utility:agent_astro" alternative-text="Agent" size="small" class="agent-avatar-icon"></lightning-icon>
+                                        </div>
+                                        <div class="agent-message-content">
+                                            <p class="message-label agent-label">{message.roleLabel}</p>
+                                            <div class="message-bubble agent-bubble">
+                                                <lightning-formatted-rich-text value={message.renderedContent} class="message-text"></lightning-formatted-rich-text>
+                                            </div>
+                                            <p class="message-time">{message.formattedTime}</p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <div class="transcript-end">
+                            <div class="end-divider"></div>
+                            <p class="end-text">END OF TRANSCRIPT</p>
+                        </div>
+                    </template>
+                    <template if:false={hasOverlayMessages}>
+                        <div class="no-messages">
+                            <p>No messages in this conversation</p>
+                        </div>
+                    </template>
+                </div>
+                <footer class="overlay-footer">
+                    <lightning-button label="Close" variant="neutral" onclick={handleCloseOverlay} class="slds-m-right_x-small"></lightning-button>
+                </footer>
+            </div>
+        </section>
+    </template>
+</template>

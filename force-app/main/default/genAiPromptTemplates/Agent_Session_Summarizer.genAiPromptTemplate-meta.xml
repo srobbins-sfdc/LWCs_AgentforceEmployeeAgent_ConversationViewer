@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Used with AgentGPT LWC to add titles to past employee agent sessions.</description>
+    <developerName>Agent_Session_Summarizer</developerName>
+    <masterLabel>Agent Session Summarizer</masterLabel>
+    <templateVersions>
+        <content>Your task is to generate a title for a session a user has had with a Salesforce Agentforce Employee Agent. You will be provided the first several messages of the interaction to understand the intent or purpose for the session. Analyze the following conversation start: {!$Input:conversationContext}
+
+Summarize the intent, purpose, or request into single sentence title between 3 to 10 words.
+</content>
+        <inputs>
+            <apiName>conversationContext</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>conversationContext</masterLabel>
+            <referenceName>Input:conversationContext</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultVertexAIGemini25FlashLite001</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <templateVersions>
+        <content>###  CONTEXT:
+Your task is to generate a title for a session a user has had with a Salesforce Agentforce Employee Agent. You will be provided the first several messages of the interaction to understand the intent or purpose for the session. Analyze the following conversation start: {!$Input:conversationContext}
+
+### REQUEST:
+Summarize the intent, purpose, or request into single sentence title between 3 to 10 words. Now generate this title.
+</content>
+        <inputs>
+            <apiName>conversationContext</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>conversationContext</masterLabel>
+            <referenceName>Input:conversationContext</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultVertexAIGemini25FlashLite001</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>
