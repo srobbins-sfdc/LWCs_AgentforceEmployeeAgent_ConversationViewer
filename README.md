@@ -20,16 +20,19 @@ Replace `myOrg` with your org alias.
 
 ## 2. Prompt template (for AI-generated session titles)
 
-The app uses the prompt template **agent_session_summarizer** to generate conversation titles.
+The app uses the prompt template **Agent_Session_Summarizer** to generate conversation titles.
 
 - **If this folder includes `force-app/main/default/genAiPromptTemplates/`**  
-  It will be deployed with the rest of the source. Ensure the template’s API name matches what the Apex expects (see `AgentGPTController.cls`: `PROMPT_TEMPLATE_NAME`).
+  The template will be deployed with the rest of the source. Ensure the template’s API name matches what the Apex expects (see `AgentGPTController.cls`: `PROMPT_TEMPLATE_NAME`).
+
+- **Activating the template after deploy**  
+  The template metadata includes `<activeVersionIdentifier>2</activeVersionIdentifier>` so the template is intended to deploy as **Active** with **Version 2** (per [Salesforce’s Prompt Builder CLI guidance](https://help.salesforce.com/s/articleView?id=ai.prompt_builder_considerations_cli.htm&type=5)). If the template is still **Inactive** after deploy (e.g. due to API or org differences), activate it once: Setup → Prompt Builder → **Agent_Session_Summarizer** → Activate.
 
 - **If `genAiPromptTemplates/` is not present**  
   Either create the template in Setup (Prompt Builder) with API name `Agent_Session_Summarizer` (or update the constant in `AgentGPTController.cls`), or retrieve it from an org that has it:
 
   ```bash
-  sf project retrieve start -m GenAiPromptTemplate:agent_session_summarizer -o myOrg
+  sf project retrieve start -m GenAiPromptTemplate:Agent_Session_Summarizer -o myOrg
   ```
 
   Then copy the retrieved `force-app/main/default/genAiPromptTemplates/` into this folder’s `force-app/main/default/` and deploy again.
@@ -45,15 +48,27 @@ sf project deploy start -o myOrg
 
 Wait for **Status: Succeeded**.
 
-## 4. Add the tab to your app
+## 4. Tab visibility and add the tab to your app
 
-The **Agent Conversations** tab and its App Page (Conversation Viewer) are deployed with this project. To show them in your app:
+The **Agent Conversations** tab and its App Page (Conversation Viewer) are deployed with this project. The tab may be **hidden by default** for all users. This package includes the permission set **Agent Conversations LWC Visibility**, which grants visibility to the tab for any user (or profile) it is assigned to.
+
+**Make the tab visible:**
+
+- **For System Administrator (recommended after deploy):**  
+  Setup → **Profiles** → **System Administrator** → **Permission Set Assignments** → **Manage Assignments** → assign **Agent Conversations LWC Visibility**. All users with the System Administrator profile will then see the tab (after adding it to the app; see below).
+
+- **For other users or profiles:**  
+  Setup → **Permission Sets** → **Agent Conversations LWC Visibility** → **Manage Assignments** → add the users or assign the permission set to the desired profile. Any user who has **Agent Conversations LWC Visibility** assigned will have visibility to the Agent Conversations tab.
+
+**Add the tab to your Lightning app:**
 
 - **Add the tab to your Lightning app**  
   Setup → App Manager → select your app → Edit → **Navigation Items** → add **Agent Conversations** → Save.
 
 - **Home tab widget (optional)**  
   Edit the app Home page in Lightning App Builder → add **Agent Sessions (Home)** → Save → Activate.
+
+**Post-deploy checklist:** (1) Assign **Agent Conversations LWC Visibility** to the System Administrator profile (and any other users/profiles as needed). (2) Add the **Agent Conversations** tab to your app's navigation items.
 
 ## 5. Verify
 

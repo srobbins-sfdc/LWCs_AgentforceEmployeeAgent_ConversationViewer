@@ -3,6 +3,7 @@
     <description>Used with AgentGPT LWC to add titles to past employee agent sessions.</description>
     <developerName>Agent_Session_Summarizer</developerName>
     <masterLabel>Agent Session Summarizer</masterLabel>
+    <activeVersionIdentifier>2</activeVersionIdentifier>
     <templateVersions>
         <content>Your task is to generate a title for a session a user has had with a Salesforce Agentforce Employee Agent. You will be provided the first several messages of the interaction to understand the intent or purpose for the session. Analyze the following conversation start: {!$Input:conversationContext}
 
