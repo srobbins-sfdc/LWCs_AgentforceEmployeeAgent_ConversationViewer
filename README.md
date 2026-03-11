@@ -26,7 +26,7 @@ The app uses the prompt template **Agent_Session_Summarizer** to generate conver
   The template will be deployed with the rest of the source. Ensure the template’s API name matches what the Apex expects (see `AgentGPTController.cls`: `PROMPT_TEMPLATE_NAME`).
 
 - **Activating the template after deploy**  
-  The template metadata includes `<activeVersionIdentifier>2</activeVersionIdentifier>` so the template is intended to deploy as **Active** with **Version 2** (per [Salesforce’s Prompt Builder CLI guidance](https://help.salesforce.com/s/articleView?id=ai.prompt_builder_considerations_cli.htm&type=5)). If the template is still **Inactive** after deploy (e.g. due to API or org differences), activate it once: Setup → Prompt Builder → **Agent_Session_Summarizer** → Activate.
+  The template metadata includes `<activeVersion>2</activeVersion>` so the template is intended to deploy as **Active** with **Version 2** (API 62.0–compatible; newer API versions may use `activeVersionIdentifier`). If the template is still **Inactive** after deploy, activate it once: Setup → Prompt Builder → **Agent_Session_Summarizer** → Activate.
 
 - **If `genAiPromptTemplates/` is not present**  
   Either create the template in Setup (Prompt Builder) with API name `Agent_Session_Summarizer` (or update the constant in `AgentGPTController.cls`), or retrieve it from an org that has it:
