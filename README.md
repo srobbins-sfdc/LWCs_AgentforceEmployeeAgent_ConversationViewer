@@ -7,7 +7,7 @@ This folder contains everything needed to deploy the AgentGPT conversation viewe
 ## Prerequisites
 
 - **Salesforce CLI** (2.0+): `sf version`
-- **Org with**: Data Cloud enabled, Agentforce / Session Tracing data model, and (for AI titles) an Einstein Prompt Template
+- **Org with**: Data Cloud enabled, Agentforce / Session Tracing data model, and (for AI titles) Prompt Builder enabled.
 - **Users of the components** must have the **Data Cloud User** permission set and either **Prompt Template User** or **Prompt Template Manager** applied (for viewing conversations and AI-generated titles).
 
 ## 1. Authenticate
@@ -27,6 +27,8 @@ The app uses the prompt template **Agent_Session_Summarizer** to generate conver
 
 - **Activating the template after deploy**  
   The template metadata includes `<activeVersion>2</activeVersion>` so the template is intended to deploy as **Active** with **Version 2** (API 62.0–compatible; newer API versions may use `activeVersionIdentifier`). If the template is still **Inactive** after deploy, activate it once: Setup → Prompt Builder → **Agent_Session_Summarizer** → Activate.
+
+⚠️ **NOTE: Deployment with CLI has usually resulted in the template being Inactive. Manual activation will likely be required.**
 
 - **If `genAiPromptTemplates/` is not present**  
   Either create the template in Setup (Prompt Builder) with API name `Agent_Session_Summarizer` (or update the constant in `AgentGPTController.cls`), or retrieve it from an org that has it:
