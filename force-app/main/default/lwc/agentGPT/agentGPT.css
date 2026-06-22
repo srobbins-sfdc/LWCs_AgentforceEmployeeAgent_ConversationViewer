@@ -178,6 +178,18 @@
     z-index: 9999;
 }
 
+/* Keyword Search */
+.search-container {
+    padding: 0.75rem 1rem 0.75rem;
+    background-color: var(--color-background-dark);
+    border-bottom: 1px solid var(--color-border-dark);
+    flex-shrink: 0;
+}
+
+.search-input {
+    width: 100%;
+}
+
 /* Session List */
 .session-list {
     flex: 1 1 auto;

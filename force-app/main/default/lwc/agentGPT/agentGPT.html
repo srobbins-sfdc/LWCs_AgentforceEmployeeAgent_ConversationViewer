@@ -40,9 +40,21 @@
                     </lightning-button-menu>
                 </div>
 
+                <!-- Keyword Search -->
+                <div class="search-container">
+                    <lightning-input
+                        type="search"
+                        variant="label-hidden"
+                        placeholder="Search conversations…"
+                        value={searchKeyword}
+                        onchange={handleSearchChange}
+                        class="search-input">
+                    </lightning-input>
+                </div>
+
                 <!-- Session List -->
                 <div class="session-list">
-                    <template if:true={hasSessions}>
+                    <template if:true={hasVisibleSessions}>
                         <template for:each={groupedSessions} for:item="group">
                             <div key={group.label} class="session-group">
                                 <div class="group-label">
@@ -72,11 +84,13 @@
                     </template>
 
                     <!-- Empty State -->
-                    <template if:false={hasSessions}>
+                    <template if:false={hasVisibleSessions}>
                         <div class="empty-state">
                             <lightning-icon icon-name="utility:chat" size="large" class="empty-icon"></lightning-icon>
-                            <p class="empty-title">No conversations found</p>
-                            <p class="empty-subtitle">Try adjusting your date filter</p>
+                            <p class="empty-title">{emptyStateTitle}</p>
+                            <template if:true={emptyStateSubtitle}>
+                                <p class="empty-subtitle">{emptyStateSubtitle}</p>
+                            </template>
                         </div>
                     </template>
                 </div>

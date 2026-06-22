@@ -13,6 +13,8 @@ export default class AgentGPT extends LightningElement {
     @track selectedSession = null;
     @track dateFilter = 7;
     @track isLoading = true;
+    /** Keyword for client-side filtering of loaded conversations (title, agent, message text). */
+    @track searchKeyword = '';
     /** User timezone from Salesforce for consistent date/time display (matches Data Cloud expectation). */
     userTimeZone = null;
 
@@ -148,6 +150,62 @@ export default class AgentGPT extends LightningElement {
     }
 
     /**
+     * Handle keyword search input
+     */
+    handleSearchChange(event) {
+        this.searchKeyword = (event.target.value || '').toLowerCase().trim();
+    }
+
+    /**
+     * Sessions matching the current keyword (title, agent name, or any message text).
+     * Returns all sessions when no keyword is entered.
+     */
+    get filteredSessions() {
+        const keyword = this.searchKeyword;
+        if (!keyword) {
+            return this.sessions;
+        }
+        return this.sessions.filter(session => {
+            const title = (session.title || '').toLowerCase();
+            const agentName = (session.agentName || '').toLowerCase();
+            if (title.includes(keyword) || agentName.includes(keyword)) {
+                return true;
+            }
+            return (session.messages || []).some(msg =>
+                (msg.text || '').toLowerCase().includes(keyword)
+            );
+        });
+    }
+
+    /**
+     * Whether any sessions are visible after applying the keyword filter
+     */
+    get hasVisibleSessions() {
+        return this.filteredSessions && this.filteredSessions.length > 0;
+    }
+
+    /**
+     * Whether the user has entered a search keyword
+     */
+    get isSearching() {
+        return this.searchKeyword.length > 0;
+    }
+
+    /**
+     * Empty-state title: distinguishes "no search matches" from "no conversations loaded"
+     */
+    get emptyStateTitle() {
+        return this.isSearching ? 'No matching conversations found.' : 'No conversations found';
+    }
+
+    /**
+     * Empty-state subtitle (hidden when searching)
+     */
+    get emptyStateSubtitle() {
+        return this.isSearching ? '' : 'Try adjusting your date filter';
+    }
+
+    /**
      * Group sessions by date for sidebar display
      */
     get groupedSessions() {
@@ -166,7 +224,7 @@ export default class AgentGPT extends LightningElement {
             previous: { label: previousLabel, icon: 'utility:date_input', sessions: [] }
         };
 
-        this.sessions.forEach(session => {
+        this.filteredSessions.forEach(session => {
             // Ensure formattedDate is set
             const formattedDate = session.formattedDate || this.formatDate(session.startTime);
             
